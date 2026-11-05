@@ -20,7 +20,7 @@ function getConfig(): { base: string; token: string } {
 async function get<T>(path: string, params: Record<string, string | undefined>): Promise<T> {
   const { base, token } = getConfig();
   const qs = new URLSearchParams(
-    Object.entries(params).filter((e): e is [string, string] => e[1] !== undefined)
+    Object.entries(params).filter((e): e is [string, string] => !!e[1])
   );
   const res = await fetch(`${base}${path}?${qs.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -32,13 +32,13 @@ async function get<T>(path: string, params: Record<string, string | undefined>):
   return res.json() as Promise<T>;
 }
 
-/** Özet rapor: marka (veya "PCDO") + tarih aralığı → gün bazlı ve toplam metrikler + gün durumu. */
-export function fetchSummary(brand: string, from: string, to: string) {
+/** Özet rapor: marka (veya "PCDO") + tarih aralığı → gün bazlı ve toplam metrikler + gün durumu.
+ *  from/to boş bırakılırsa backend kendi varsayılan aralığını seçer. */
+export function fetchSummary(brand: string, from?: string, to?: string) {
   return get<SummaryResponse>("/api/reports/summary", { brand, from, to });
 }
 
-/** TOFASCRM'in Detail PDF export uç noktasının doğrudan indirme linki (yeni sekmede açılır). */
-export function pdfDownloadUrl(brand: string, from: string, to: string): string {
+function pdfUrl(path: "pdf" | "executive", brand: string, from: string, to: string): string {
   // Render sırasında fırlatmamak için burada sessizce "#" döner; asıl yapılandırma
   // hatası zaten özet rapor isteği (fetchSummary) üzerinden kullanıcıya gösterilir.
   if (!API_BASE || !MODULE_TOKEN) return "#";
@@ -46,5 +46,15 @@ export function pdfDownloadUrl(brand: string, from: string, to: string): string 
   // header'ı taşınamaz; token bu yüzden query param olarak gönderilir (backend
   // tarafında /api/reports/* için bu şekilde de kabul ediliyor — aynı dar kapsam).
   const qs = new URLSearchParams({ brand, from, to, token: MODULE_TOKEN });
-  return `${API_BASE}/api/reports/pdf?${qs.toString()}`;
+  return `${API_BASE}/api/reports/${path}?${qs.toString()}`;
+}
+
+/** TOFASCRM'in Detail PDF export uç noktasının doğrudan indirme linki (yeni sekmede açılır). */
+export function pdfDownloadUrl(brand: string, from: string, to: string): string {
+  return pdfUrl("pdf", brand, from, to);
+}
+
+/** TOFASCRM'in Executive PDF export uç noktasının doğrudan indirme linki. */
+export function executiveDownloadUrl(brand: string, from: string, to: string): string {
+  return pdfUrl("executive", brand, from, to);
 }

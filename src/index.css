@@ -1,3 +1,117 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ───────────────────────────────────────────────────────────────
+   TOFASCRM görsel dili — asıl panelden taşınmıştır (kaynak:
+   cnx2026/TOFASCRM, tasarim-v2 dalı, src/app/globals.css).
+   Çakışmayı önlemek için tüm özel sınıf/değişkenler ".tcrm-root"
+   içine kapsanmıştır (Sanalyzer'ın kendi stillerini etkilemez).
+   ─────────────────────────────────────────────────────────────── */
+
+.tcrm-root {
+  --tcrm-navy: #003d5a;
+  --tcrm-navy-deep: #00293f;
+  --tcrm-teal: #2ed8c3;
+  --tcrm-yellow: #fbca18;
+
+  --tcrm-bg: #001d2c;
+  --tcrm-surface: rgba(255, 255, 255, 0.055);
+  --tcrm-surface-hi: rgba(255, 255, 255, 0.09);
+  --tcrm-border: rgba(255, 255, 255, 0.1);
+  --tcrm-border-hi: rgba(255, 255, 255, 0.2);
+  --tcrm-text: #e8f3f7;
+  --tcrm-muted: #8fb3c4;
+  --tcrm-accent: #2ed8c3;
+  --tcrm-accent-strong: #0a8578;
+  --tcrm-glow-a: rgba(46, 216, 195, 0.16);
+  --tcrm-glow-b: rgba(251, 202, 24, 0.07);
+  --tcrm-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --tcrm-ease: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: var(--tcrm-bg);
+  color: var(--tcrm-text);
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tcrm-app-bg {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, var(--tcrm-glow-a), transparent 60%),
+    radial-gradient(46rem 34rem at 100% 105%, var(--tcrm-glow-b), transparent 60%),
+    radial-gradient(40rem 30rem at 85% 5%, rgba(0, 93, 133, 0.28), transparent 65%),
+    var(--tcrm-bg);
+}
+.tcrm-content { position: relative; z-index: 1; }
+
+.tcrm-glass {
+  background: var(--tcrm-surface);
+  border: 1px solid var(--tcrm-border);
+  box-shadow: var(--tcrm-shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+.tcrm-glass-hi {
+  background: var(--tcrm-surface-hi);
+  border: 1px solid var(--tcrm-border-hi);
+  box-shadow: var(--tcrm-shadow);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+}
+.tcrm-text-muted { color: var(--tcrm-muted); }
+.tcrm-text-accent { color: var(--tcrm-accent); }
+
+.tcrm-glass-accent { position: relative; overflow: hidden; }
+.tcrm-glass-accent::before {
+  content: ""; position: absolute; left: 14px; right: 14px; top: 0; height: 2px;
+  background: linear-gradient(90deg, var(--tcrm-teal), var(--tcrm-yellow)); border-radius: 0 0 2px 2px; opacity: 0.9;
+}
+
+.tcrm-pressable { transition: transform 140ms var(--tcrm-ease), background-color 160ms ease, border-color 160ms ease, color 160ms ease, opacity 160ms ease; }
+.tcrm-pressable:active { transform: scale(0.97); }
+
+@media (hover: hover) {
+  .tcrm-lift { transition: transform 180ms var(--tcrm-ease), border-color 180ms ease, box-shadow 180ms ease; }
+  .tcrm-lift:hover { transform: translateY(-2px); border-color: var(--tcrm-border-hi); }
+}
+
+@keyframes tcrmPageIn {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+.tcrm-animate-in { animation: tcrmPageIn 0.28s var(--tcrm-ease) both; }
+
+@keyframes tcrmCardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tcrm-card-in { animation: tcrmCardIn 0.26s var(--tcrm-ease) both; animation-delay: calc(var(--i, 0) * 28ms); }
+
+@keyframes tcrmDrawLine { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes tcrmRingIn { from { stroke-dashoffset: var(--ring-from); } }
+
+.tcrm-skeleton { position: relative; overflow: hidden; background: var(--tcrm-surface); border: 1px solid var(--tcrm-border); border-radius: 16px; }
+.tcrm-skeleton::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: tcrmShimmer 1.3s ease-in-out infinite;
+}
+@keyframes tcrmShimmer { to { transform: translateX(100%); } }
+
+.tcrm-root select option { background-color: #002b40; color: #e8f3f7; }
+
+.tcrm-root ::-webkit-scrollbar { width: 6px; height: 6px; }
+.tcrm-root ::-webkit-scrollbar-thumb { background: rgba(143, 179, 196, 0.35); border-radius: 10px; }
+.tcrm-root ::-webkit-scrollbar-thumb:hover { background: rgba(143, 179, 196, 0.55); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tcrm-animate-in, .tcrm-card-in, .tcrm-skeleton::after { animation: none; }
+  .tcrm-pressable, .tcrm-lift { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tcrm-glass, .tcrm-glass-hi { background: var(--tcrm-surface-hi); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
